@@ -51,8 +51,8 @@ async def scraper():
 
     await page.sleep(8)
     finding_date_cheapest_fare = await page.query_selector('#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child(8) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
-    print(await finding_date_cheapest_fare.get_html().get_content)
-
+    finding_date_cheapest_fare = finding_date_cheapest_fare.text
+    print(finding_date_cheapest_fare)
 
     await page.close()
     print("Page closed. Script finished successfully.")
