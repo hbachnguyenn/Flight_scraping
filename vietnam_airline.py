@@ -12,18 +12,16 @@ async def scraper():
     print("Navigated to the website.")
 
     # Wait for the page to load fully
-    await page.sleep(5)  # Adjust as necessary
+    await page.sleep(2)  # Adjust as necessary
     print("Page loaded.")
 
     cookie_accept_button = await page.query_selector('#cookie-agree')
     await cookie_accept_button.click()
-    await page.sleep(3)
 
     # Select and interact with the "flight from" input field
     flight_from = await page.query_selector('#city-from-roundtrip')
     await flight_from.click()
     await flight_from.set_value("Ho Chi Minh City (SGN), Vietnam")
-    await page.sleep(3)
 
     # Select and interact with the "flight to" input field
     flight_to = await page.query_selector('#to-bookYourTripTo-OCEANIA > ul > li:nth-child(2) > a > div')
@@ -33,9 +31,6 @@ async def scraper():
     else:
         print("Failed to find 'Flight To' input field.")
 
-    # Wait briefly to see the result
-    await page.sleep(5)
-
     # Select and click the "oneway" radio button
     oneway = await page.query_selector('#oneway')
     if oneway:
@@ -44,23 +39,20 @@ async def scraper():
     else:
         print("Failed to find the 'One-way' radio button.")
 
-    # Wait briefly to observe changes
-    await page.sleep(5)
-
     flight_date = await page.query_selector('#roundtrip-date-depart')
     await flight_date.click()
 
     table = await page.query_selector('#byt-datespicker > div > div.ui-datepicker-group.ui-datepicker-group-first > table')
     date = await table.query_selector('tbody > tr:nth-child(5) > td:nth-child(5)')
     await date.click()
-    if date:
-        print("Found date 31")
-
-    # Close the page and driver
 
     find_flight_button = await page.query_selector('#btnSubmitBookYourTrip')
     await find_flight_button.click()
-    await page.sleep(10)
+
+    await page.sleep(8)
+    finding_date_cheapest_fare = await page.query_selector('#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child(8) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
+    print(await finding_date_cheapest_fare.get_html().get_content)
+
 
     await page.close()
     print("Page closed. Script finished successfully.")
