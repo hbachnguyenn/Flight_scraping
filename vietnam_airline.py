@@ -22,15 +22,13 @@ def get_input_from_user(data: dict):
         data['date'] = full_date
         break
 
-
-
 async def scraper(data: dict):
     # Start the driver
     driver = await uc.start()
 
     # Navigate to the page
     page = await driver.get('https://www.vietnamairlines.com/vn/en/home')
-    await page.sleep(1)
+    await page.sleep(2)
 
     # Accept all cookies
     cookie_accept_button = await page.query_selector('#cookie-agree')
@@ -61,16 +59,15 @@ async def scraper(data: dict):
     await find_flight_button.click()
 
     await page.sleep(8)
-    finding_date_cheapest_fare = await page.query_selector('#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child(9) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
-
-    finding_date_cheapest_fare = finding_date_cheapest_fare.text
-    print(finding_date_cheapest_fare)
+    for i in range(15):
+        finding_date_cheapest_fare = await page.query_selector(f'#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child({i+2}) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
+        finding_date_cheapest_fare = finding_date_cheapest_fare.text
+        print(helper.price_format(finding_date_cheapest_fare))
 
     await page.close()
 
-
-
 if __name__ == '__main__':
     flight_info = {}
+    price = {}
     get_input_from_user(flight_info)
-    asyncio.run(scraper(flight_info))
+    asyncio.get_event_loop().run_until_complete(scraper(flight_info))
