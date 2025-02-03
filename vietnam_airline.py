@@ -4,10 +4,10 @@ import asyncio
 import helper
 
 
-def get_input_from_user(flight_info: dict):
+def get_input_from_user(data: dict):
     print("Ho Chi Minh City - Sydney oneway flight")
     print("Please fill in the date of the flight!")
-    print('\n\n')
+    print()
 
     while True:
         date = input("Please fill in the date: ")
@@ -19,22 +19,20 @@ def get_input_from_user(flight_info: dict):
             print()
             continue
 
-        flight_info['date'] = full_date
+        data['date'] = full_date
+        break
 
 
-async def scraper():
+
+async def scraper(data: dict):
     # Start the driver
     driver = await uc.start()
-    print("Driver started successfully!")
 
     # Navigate to the page
     page = await driver.get('https://www.vietnamairlines.com/vn/en/home')
-    print("Navigated to the website.")
+    await page.sleep(1)
 
-    # Wait for the page to load fully
-    await page.sleep(2)  # Adjust as necessary
-    print("Page loaded.")
-
+    # Accept all cookies
     cookie_accept_button = await page.query_selector('#cookie-agree')
     await cookie_accept_button.click()
 
@@ -45,41 +43,34 @@ async def scraper():
 
     # Select and interact with the "flight to" input field
     flight_to = await page.query_selector('#to-bookYourTripTo-OCEANIA > ul > li:nth-child(2) > a > div')
-    if flight_to:
-        await flight_to.click()
-        print("Set 'Flight To' successfully.")
-    else:
-        print("Failed to find 'Flight To' input field.")
+    await flight_to.click()
 
     # Select and click the "oneway" radio button
     oneway = await page.query_selector('#oneway')
-    if oneway:
-        await oneway.click()
-        print("Clicked on the 'One-way' option successfully.")
-    else:
-        print("Failed to find the 'One-way' radio button.")
+    await oneway.click()
 
+    # Select date
     flight_date = await page.query_selector('#roundtrip-date-depart')
     await flight_date.click()
 
     table = await page.query_selector('#byt-datespicker > div > div.ui-datepicker-group.ui-datepicker-group-first > table')
-    date = await table.query_selector('tbody > tr:nth-child(5) > td:nth-child(5)')
+    date = await table.query_selector(helper.date_css_selector(data['date']))
     await date.click()
 
     find_flight_button = await page.query_selector('#btnSubmitBookYourTrip')
     await find_flight_button.click()
 
     await page.sleep(8)
-    finding_date_cheapest_fare = await page.query_selector('#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child(8) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
+    finding_date_cheapest_fare = await page.query_selector('#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child(9) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
+
     finding_date_cheapest_fare = finding_date_cheapest_fare.text
     print(finding_date_cheapest_fare)
 
     await page.close()
-    print("Page closed. Script finished successfully.")
 
 
 
 if __name__ == '__main__':
     flight_info = {}
     get_input_from_user(flight_info)
-    asyncio.run(scraper())
+    asyncio.run(scraper(flight_info))
