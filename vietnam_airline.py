@@ -1,6 +1,26 @@
 import nodriver as uc
 import asyncio
 
+import helper
+
+
+def get_input_from_user(flight_info: dict):
+    print("Ho Chi Minh City - Sydney oneway flight")
+    print("Please fill in the date of the flight!")
+    print('\n\n')
+
+    while True:
+        date = input("Please fill in the date: ")
+        month = input("Please fill in the month: ")
+        year = input("Please fill in the year: ")
+        full_date = helper.date_format(date, month, year)
+        if not helper.date_validation(full_date):
+            print("Filled date is inappropriate, try again!")
+            print()
+            continue
+
+        flight_info['date'] = full_date
+
 
 async def scraper():
     # Start the driver
@@ -58,5 +78,8 @@ async def scraper():
     print("Page closed. Script finished successfully.")
 
 
+
 if __name__ == '__main__':
+    flight_info = {}
+    get_input_from_user(flight_info)
     asyncio.run(scraper())
