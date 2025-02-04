@@ -1,7 +1,8 @@
 import nodriver as uc
 import asyncio
-
+from datetime import datetime
 import helper
+
 
 
 def get_input_from_user(data: dict):
@@ -66,8 +67,9 @@ async def scraper(data: dict):
 
     await page.close()
 
+
+
 if __name__ == '__main__':
     flight_info = {}
-    price = {}
     get_input_from_user(flight_info)
     asyncio.get_event_loop().run_until_complete(scraper(flight_info))
