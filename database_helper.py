@@ -35,7 +35,6 @@ def inspect_schema(db):
 
 def create_flight_table(conn):
     conn.execute(text("""
-        DROP TABLE IF EXISTS "sgn-syd";
         CREATE TABLE IF NOT EXISTS "sgn-syd" (
             departure VARCHAR(10),
             destination VARCHAR(10),

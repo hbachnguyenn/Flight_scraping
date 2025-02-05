@@ -60,11 +60,11 @@ async def scraper(data: dict):
     await find_flight_button.click()
 
     await page.sleep(8)
-    for i in range(15):
-        finding_date_cheapest_fare = await page.query_selector(f'#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child({i+2}) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
-        finding_date_cheapest_fare = finding_date_cheapest_fare.text
-        print(helper.price_format(finding_date_cheapest_fare))
-
+    for i in range(9):
+        finding_date_cheapest_fare = await page.query_selector(f'#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child({i+9}) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span')
+        if finding_date_cheapest_fare:
+            print(type(finding_date_cheapest_fare))
+            print(helper.price_format(finding_date_cheapest_fare.text))
     await page.close()
 
 
