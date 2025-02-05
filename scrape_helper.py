@@ -1,5 +1,6 @@
 import nodriver as uc
 import helper
+import pandas as pd
 from datetime import datetime, timedelta
 
 
@@ -43,27 +44,27 @@ async def fill_in_data(page, date: datetime):
     await page.sleep(8)
     return page
 
-async def scrape_data_30_days(page) -> [dict]:
-    data = []
+async def scrape_data_30_days(page) -> pd.DataFrame:
+    # Initialize an empty DataFrame with the desired structure
+    data = pd.DataFrame(columns=['departure', 'destination', 'price', 'brand', 'flight_date', 'scrape_date'])
     i = 0
+
     while i < 30:
         # Select the cheapest fare for the current day
         selector_path = f'#cdk-accordion-child-1 > div > refx-carousel > div > ul > li:nth-child({i + 8}) > div > button > span.mdc-button__label > div.cell-content-top > div > refx-price-cont > refx-price > span > span'
         cheapest_fare_selector = await page.query_selector(selector_path)
 
-        # Helper to create and store the flight record
-        def record_flight():
+        if cheapest_fare_selector:
+            # Create a record and append it to the DataFrame
             record = {
                 'departure': 'SGN',
                 'destination': 'SYD',
                 'price': helper.price_format(cheapest_fare_selector.text),
+                'brand': 'VN',
                 'scrape_date': datetime.now().strftime("%Y-%m-%d"),
                 'flight_date': (datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"),
             }
-            data.append(record)
-
-        if cheapest_fare_selector:
-            record_flight()
+            data = pd.concat([data, pd.DataFrame([record])], ignore_index=True)  # Update the DataFrame
             i += 1  # Move to the next day only if a fare is found
         else:
             # Handle the "load more" scenario
@@ -72,7 +73,7 @@ async def scrape_data_30_days(page) -> [dict]:
             )
             if load_more_btn:
                 await load_more_btn.click()
-                await page.sleep(3)
+                await page.sleep(1)
 
     await page.close()
     return data

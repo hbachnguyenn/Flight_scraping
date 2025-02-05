@@ -35,12 +35,14 @@ def inspect_schema(db):
 
 def create_flight_table(conn):
     conn.execute(text("""
-        CREATE TABLE IF NOT EXISTS "sgn-syd" (
+        DROP TABLE IF EXISTS sgn_syd;
+        CREATE TABLE IF NOT EXISTS "sgn_syd" (
             departure VARCHAR(10),
             destination VARCHAR(10),
             price INTEGER,
+            brand VARCHAR(3),
             flight_date TIMESTAMP,
-            search_date TIMESTAMP
+            scrape_date TIMESTAMP
         )
     """))
 
@@ -55,4 +57,7 @@ def query(conn, sqlcmd, args=None, df=True):
     except Exception as e:
         print("Error encountered: ", e, sep='\n')
     return result
+
+def save_data(conn, data: pd.DataFrame):
+    data.to_sql(name='sgn_syd', con=conn, if_exists='append', index=False)
 
